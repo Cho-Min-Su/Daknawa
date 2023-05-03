@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<!-- 게시글 모든 정보 -->
+    <entry key="selectAdminPostList">
+	SELECT POST_NO, POST_TITLE, POST_CONTENT, MEMBER_NICKNAME, POST_VIEW, POST_DATE
+				FROM POST P
+				JOIN POST_CATEGORY USING (POST_CAT_NO)
+				JOIN MEMBER USING (MEMBER_NO)
+			ORDER BY POST_NO DESC
+	</entry>
+
+	<entry key="selectQnaList">
+       SELECT *
+  		 FROM QNA
+  		WHERE STATUS = 'Y'
+	</entry>
+
+	<entry key="selectStoreList">
+      SELECT STORE_NO, STORE_NAME, STORE_ADDRESS, STORE_PHONE ,STORE_TIME, STATUS, BRAND_NAME
+		FROM STORE
+		JOIN BRAND USING (BRAND_NO)
+		WHERE STATUS = 'Y'
+	</entry>	
+
+	<entry key="selectPostList">
+        SELECT POST_NO, POST_TITLE, POST_CONTENT, POST_VIEW, POST_DATE
+		  FROM POST
+		 WHERE MEMBER_NO = ?
+		   AND STATUS = 'Y'
+	</entry>
+	
+	<entry key="selectReplyList">
+       SELECT *
+		FROM REPLY
+		WHERE MEMBER_NO = ?
+		  AND STATUS = 'Y'
+	</entry>
+
+	<entry key="selectMenuList">
+      SELECT BRAND_NO, MENU_NO, MENU_NAME, MENU_PRICE, MENU_CATEGORY, MENU_DESC, M.STATUS, BRAND_NAME
+		FROM MENU M
+		JOIN BRAND USING (BRAND_NO)
+		WHERE STATUS = 'Y'
+	</entry>
+	
+</properties>

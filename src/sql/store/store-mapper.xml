@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="insertStore">
+		INSERT INTO STORE(STORE_NO
+						, STORE_NAME
+						, STORE_ADDRESS
+						, STORE_PHONE
+						, STORE_TIME
+						, STATUS
+						, BRAND_NO)
+				   VALUES(SEQ_SNO.NEXTVAL
+				   		, ?
+				   		, ?
+				   		, ?
+				   		, ?
+				   		, DEFAULT
+				   		, (SELECT BRAND_NO
+                             FROM BRAND
+                            WHERE BRAND_NAME = ?))
+	</entry>
+	
+	<entry key="selectStore">
+        SELECT STORE_NO
+		     , STORE_NAME
+		     , STORE_ADDRESS
+		     , STORE_PHONE
+		     , STORE_TIME
+		     , BRAND_NAME
+		  FROM STORE
+		  JOIN BRAND USING (BRAND_NO)
+		 WHERE STORE_NO = ?
+	</entry>
+	
+	<entry key="updateStore">
+		UPDATE STORE S
+		   SET STORE_NAME = ?
+		     , STORE_ADDRESS = ?
+		     , STORE_PHONE = ?
+		     , STORE_TIME = ?
+             , BRAND_NO = (SELECT BRAND_NO
+                             FROM BRAND
+                            WHERE BRAND_NAME = ?)
+         WHERE STORE_NO = ?
+           AND S.STATUS = 'Y'
+	</entry>
+	
+	<entry key="deleteStore">
+		UPDATE STORE
+		   SET STATUS = 'N'
+		 WHERE STORE_NO = ?
+	</entry>
+
+	<entry key="countBrand">
+		SELECT COUNT(*) COUNT
+		  FROM BRAND
+		 WHERE BRAND_NAME = ?
+	</entry>
+	
+	<entry key="insertBrand">
+		INSERT INTO BRAND
+		VALUES(SEQ_BNO.NEXTVAL
+			 , ?)
+		
+	</entry>
+	
+	<!-- 매장 전체 조회 + 검색 결과 조회 -->
+	<entry key="selectStoreListCount">
+		SELECT COUNT(*) COUNT
+		  FROM STORE S
+          JOIN BRAND B USING (BRAND_NO)
+		 WHERE S.STATUS = 'Y'		 
+		   AND BRAND_NAME LIKE ?
+           AND STORE_NAME LIKE ?  
+	</entry>
+	
+	<entry key="selectStoreList">
+		SELECT *
+	    FROM (
+	            SELECT ROWNUM RNUM
+	            , A.*
+	    FROM (
+	            SELECT STORE_NO
+	                 , STORE_NAME
+	                 , STORE_ADDRESS
+	                 , STORE_PHONE
+	                 , STORE_TIME
+	                 , BRAND_NAME
+	          FROM STORE S
+	          JOIN BRAND B USING (BRAND_NO)
+	         	WHERE S.STATUS = 'Y'
+	           AND BRAND_NAME LIKE ?
+	           AND STORE_NAME LIKE ?
+	         	ORDER BY STORE_NO DESC
+	      		) A
+	    	)
+		WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	
+</properties>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<!-- 게시글 모든 정보 -->
+    <entry key="insertReport">
+     	INSERT INTO REPORT (REPORT_NO
+                  , REPORT_CATEGORY
+                  , REPORT_CONTENT
+                  , REPORT_TYPE
+                  , REPORT_ANSWER
+                  , MEMBER_NO
+                  , RE_MEMBER_NO
+                  , PORT_NO
+                  , PEPLY_NO)
+           VALUES (SEQ_RNO.NEXTVAL
+                 , ?
+                 , ?
+                 , ?
+                 , ?
+                 , ?
+                 , ?
+                 , ?
+                 , ?)
+	</entry>
+
+	<entry key="selectReportList">
+		SELECT *
+ 	      FROM REPORT
+	</entry>
+
+	<entry key="updateReport">
+		UPDATE REPORT
+	       SET REPORT_TYPE = 1
+	      	 , REPORT_ANSWER = ?
+	     WHERE REPORT_NO = ?
+	</entry>
+
+	<entry key="deleteReport">
+		DELETE REPORT
+ 	     WHERE REPORT_NO = ?
+	</entry>
+
+</properties>

@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<entry key="selectList">
+		SELECT MENU_NO, MENU_NAME, MENU_PRICE, MENU_DESC,
+		MENU_CATEGORY, BRAND_NO
+		FROM MENU
+		WHERE STATUS = 'Y'
+	</entry>
+
+	<entry key="selectDeList">
+		SELECT M.MENU_NO, M.MENU_NAME, M.MENU_PRICE,
+		M.MENU_CATEGORY, M.BRAND_NO, M.MENU_DESC, M.MENU_VIEW, B.BRAND_NAME
+		FROM (
+		SELECT *
+		FROM MENU
+		WHERE MENU_NO = ? AND STATUS = 'Y'
+		UNION ALL
+		SELECT *
+		FROM (
+		SELECT *
+		FROM MENU
+		WHERE MENU_NO != ? AND STATUS = 'Y'
+		ORDER BY MENU_VIEW DESC
+		)
+		WHERE ROWNUM &lt;= 4
+		) M
+		JOIN BRAND B ON
+		M.BRAND_NO = B.BRAND_NO
+		WHERE ROWNUM &lt;= 5
+	</entry>
+
+	<entry key="selectImgDeList">
+		SELECT A.FILE_NO, A.ORIGIN_NAME, A.CHANGE_NAME,
+		A.FILE_PATH, A.MENU_NO
+		FROM ATTACHMENT A
+		JOIN MENU ON A.MENU_NO =
+		MENU.MENU_NO
+		WHERE A.STATUS = 'Y' AND (
+		A.MENU_NO = ?
+		OR A.MENU_NO IN (
+		SELECT MENU_NO
+		FROM (
+		SELECT MENU_NO, MENU_VIEW,
+		ROW_NUMBER() OVER (ORDER
+		BY
+		CASE WHEN MENU_NO = ? THEN 0 ELSE MENU_VIEW END DESC) AS RN
+		FROM MENU
+		WHERE MENU_NO != ?
+		)
+		WHERE RN &lt;= 5
+		)
+		)
+		ORDER BY CASE WHEN A.MENU_NO = ?
+		THEN 0 ELSE 1 END, MENU.MENU_VIEW DESC
+	</entry>
+
+	<entry key="increaseCount">
+		UPDATE MENU
+		SET MENU_VIEW = MENU_VIEW + 1
+		WHERE MENU_NO
+		= ?
+	</entry>
+
+	<entry key="selectListCount">
+		SELECT COUNT(*) COUNT
+		FROM MENU
+		WHERE STATUS = 'Y'
+	</entry>
+
+	<entry key="selectCListCount">
+		SELECT COUNT(*) COUNT
+		FROM MENU
+		WHERE STATUS = 'Y' AND
+		MENU_CATEGORY = ?
+	</entry>
+
+	<entry key="selectPageList">
+		SELECT M.MENU_NO
+		, M.MENU_NAME
+		, M.MENU_PRICE
+		,
+		M.MENU_CATEGORY
+		, M.BRAND_NO
+		, B.BRAND_NAME
+		, M.MENU_DESC
+		,
+		COUNT(L.MENU_NO) AS LIKE_COUNT
+		FROM MENU M
+		LEFT JOIN MENU_LIKE L ON
+		M.MENU_NO = L.MENU_NO
+		LEFT JOIN BRAND B ON M.BRAND_NO = B.BRAND_NO
+		WHERE M.STATUS = 'Y' AND M.MENU_NO BETWEEN ? AND ?
+		GROUP BY M.MENU_NO,
+		M.MENU_NAME, M.MENU_PRICE, M.MENU_CATEGORY, M.BRAND_NO,
+		B.BRAND_NAME,
+		M.MENU_DESC
+		ORDER BY LIKE_COUNT DESC, M.MENU_NO DESC
+	</entry>
+
+	<entry key="selectImgPageList">
+		SELECT FILE_NO
+		, ORIGIN_NAME
+		, CHANGE_NAME
+		, FILE_PATH
+		,
+		MENU_NO
+		FROM ATTACHMENT
+		WHERE STATUS = 'Y'
+		AND MENU_NO BETWEEN ? AND ?
+		ORDER BY
+		(SELECT COUNT(*) FROM MENU_LIKE WHERE MENU_NO =
+		ATTACHMENT.MENU_NO) DESC,
+		MENU_NO DESC
+	</entry>
+
+	<entry key="selectPageChList">
+		SELECT M.MENU_NO, M.MENU_NAME, M.MENU_PRICE,
+		M.MENU_CATEGORY,
+		M.BRAND_NO, M.MENU_DESC, B.BRAND_NAME
+		FROM (
+		SELECT
+		ROWNUM AS RNUM, TMP.*
+		FROM (
+		SELECT M.MENU_NO, M.MENU_NAME,
+		M.MENU_PRICE, M.MENU_CATEGORY,
+		M.BRAND_NO, M.MENU_DESC,
+		COUNT(L.MENU_NO) AS LIKE_CNT
+		FROM MENU M
+		LEFT JOIN MENU_LIKE L ON
+		M.MENU_NO = L.MENU_NO
+		WHERE M.MENU_CATEGORY = ?
+		AND M.STATUS = 'Y'
+		GROUP
+		BY M.MENU_NO, M.MENU_NAME, M.MENU_PRICE,
+		M.MENU_CATEGORY, M.BRAND_NO,
+		M.MENU_DESC
+		ORDER BY LIKE_CNT DESC
+		) TMP
+		WHERE ROWNUM &lt;= ?
+		) R
+		JOIN MENU
+		M ON R.MENU_NO = M.MENU_NO
+		JOIN BRAND B ON M.BRAND_NO = B.BRAND_NO
+		WHERE RNUM &gt;= ?
+	</entry>
+
+	<entry key="selectImgPageChList">
+		SELECT A.FILE_NO, A.ORIGIN_NAME, A.CHANGE_NAME,
+		A.FILE_PATH, A.MENU_NO
+		FROM ATTACHMENT A
+		WHERE A.MENU_NO IN (
+		SELECT
+		MENU_NO
+		FROM (
+		SELECT ROWNUM AS RNUM, TMP.*
+		FROM (
+		SELECT M.MENU_NO,
+		M.MENU_NAME, M.MENU_PRICE, M.MENU_CATEGORY, M.BRAND_NO, M.MENU_DESC,
+		COUNT(L.MENU_NO) AS LIKE_CNT
+		FROM MENU M
+		LEFT JOIN MENU_LIKE L ON
+		M.MENU_NO = L.MENU_NO
+		WHERE M.MENU_CATEGORY = ?
+		AND M.STATUS = 'Y'
+		GROUP
+		BY M.MENU_NO,
+		M.MENU_NAME, M.MENU_PRICE, M.MENU_CATEGORY, M.BRAND_NO,
+		M.MENU_DESC
+		ORDER BY LIKE_CNT DESC
+		) TMP
+		WHERE ROWNUM &lt;= ?
+		)
+		WHERE RNUM
+		&gt;= ?)
+	</entry>
+
+	<entry key="selectPageDetailList">
+		SELECT MENU_NO
+		, MENU_NAME
+		, MENU_PRICE
+		, MENU_CATEGORY
+		,
+		BRAND_NO
+		, MENU_DESC
+		FROM MENU
+		WHERE STATUS = 'Y'
+		AND MENU_NO BETWEEN ?
+		AND ?
+		ORDER BY MENU_NO DESC
+	</entry>
+
+
+
+	<entry key="insertMenu">
+		INSERT INTO MENU
+		(MENU_NO
+		, MENU_NAME
+		, MENU_PRICE
+		,
+		MENU_CATEGORY
+		, BRAND_NO
+		, MENU_DESC
+		, STATUS)
+		VALUES
+		(SEQ_MENO.NEXTVAL
+		, ?
+		, ?
+		, ?
+		, ?
+		, ?
+		, 'Y')
+	</entry>
+
+	<entry key="insertAttachment">
+		INSERT INTO ATTACHMENT
+		(FILE_NO
+		, MENU_NO
+		, ORIGIN_NAME
+		,
+		CHANGE_NAME
+		, FILE_PATH)
+		VALUES
+		(SEQ_ANO.NEXTVAL
+		, SEQ_MENO.CURRVAL
+		, ?
+		, ?
+		, ?)
+	</entry>
+
+	<entry key="deleteMenu">
+		UPDATE MENU
+		SET STATUS = 'N'
+		WHERE MENU_NO = ?
+	</entry>
+
+	<entry key="selectMenu">
+		SELECT MENU_NO
+		, MENU_NAME
+		, MENU_PRICE
+		, MENU_CATEGORY
+		,
+		BRAND_NO
+		, MENU_DESC
+		FROM MENU
+		WHERE STATUS = 'Y'
+		AND MENU_NO = ?
+	</entry>
+
+	<entry key="selectAttachment">
+		SELECT FILE_NO
+		, ORIGIN_NAME
+		, CHANGE_NAME
+		, FILE_PATH
+		,
+		MENU_NO
+		FROM ATTACHMENT
+		WHERE STATUS = 'Y'
+		AND MENU_NO = ?
+	</entry>
+
+	<entry key="updateMenu">
+		UPDATE MENU
+		SET MENU_NAME = ?
+		, MENU_PRICE = ?
+		,
+		MENU_CATEGORY = ?
+		, BRAND_NO = ?
+		, MENU_DESC = ?
+		WHERE MENU_NO = ?
+	</entry>
+
+	<entry key="updateAttachment">
+		UPDATE ATTACHMENT
+		SET ORIGIN_NAME = ?
+		, CHANGE_NAME = ?
+		, FILE_PATH = ?
+		, FILE_DATE = SYSDATE
+		WHERE FILE_NO = ?
+	</entry>
+
+	<entry key="insertNewAttachment">
+		INSERT INTO ATTACHMENT
+		(FILE_NO
+		, MENU_NO
+		, ORIGIN_NAME
+		,
+		CHANGE_NAME
+		, FILE_PATH)
+		VALUES
+		(SEQ_ANO.NEXTVAL
+		, ?
+		, ?
+		, ?
+		, ?)
+	</entry>
+
+	<entry key="selectSEListCount">
+		SELECT COUNT(*) COUNT
+		FROM MENU
+		WHERE STATUS = 'Y' AND
+		MENU_NAME LIKE '%' || ? || '%'
+	</entry>
+
+	<entry key="searchMenu">
+		SELECT * FROM (
+		SELECT M.MENU_NO, M.MENU_NAME,
+		M.MENU_PRICE,
+		M.MENU_CATEGORY, M.BRAND_NO,
+		B.BRAND_NAME,
+		M.MENU_DESC,
+		A.FILE_PATH || A.CHANGE_NAME AS FILE_PATH,
+		ROW_NUMBER() OVER (ORDER BY
+		M.MENU_NO) AS RN
+		FROM MENU M
+		LEFT JOIN ATTACHMENT A ON M.MENU_NO =
+		A.MENU_NO
+		LEFT JOIN BRAND B ON M.BRAND_NO = B.BRAND_NO
+		WHERE M.MENU_NAME
+		LIKE '%' || ? || '%'
+		) WHERE RN BETWEEN ? AND ?
+	</entry>
+
+	<entry key="searchCMenu">
+		SELECT * FROM (
+		SELECT M.MENU_NO, M.MENU_NAME, M.MENU_PRICE,
+		M.MENU_CATEGORY, M.BRAND_NO, B.BRAND_NAME,
+		M.MENU_DESC, A.FILE_PATH || A.CHANGE_NAME AS FILE_PATH,
+		ROW_NUMBER() OVER (ORDER BY M.MENU_NO) AS RN
+		FROM MENU M
+		LEFT JOIN BRAND B ON M.BRAND_NO = B.BRAND_NO
+		LEFT JOIN ATTACHMENT A ON M.MENU_NO = A.MENU_NO
+		WHERE M.MENU_NAME LIKE '%' || ? || '%'
+		AND M.MENU_CATEGORY = ?
+		) WHERE RN BETWEEN ? AND ?
+	</entry>
+
+	<entry key="insertHeart">
+		INSERT INTO MENU_LIKE (MEMBER_NO, MENU_NO)
+		VALUES (?,
+		?)
+	</entry>
+
+	<entry key="heart">
+		DELETE FROM MENU_LIKE
+		WHERE MEMBER_NO = ? AND MENU_NO
+		=?
+	</entry>
+
+	<entry key="selectHeart">
+		SELECT COUNT(*) COUNT
+		FROM MENU_LIKE
+		WHERE MEMBER_NO = ?
+		AND MENU_NO = ?
+	</entry>
+
+	<entry key="heartCount">
+		SELECT COUNT(*) COUNT
+		FROM MENU_LIKE
+		WHERE MENU_NO = ?
+	</entry>
+
+</properties>

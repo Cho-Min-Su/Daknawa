@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+    <entry key="selectReviewListCount">
+		SELECT COUNT(*) COUNT
+	      FROM POST
+	     WHERE STATUS = 'Y'
+	       AND POST_CAT_NO = 3
+	</entry>
+
+    <entry key="selectReviewList">
+        SELECT *
+			FROM (
+				SELECT ROWNUM RNUM, A.*
+					FROM (SELECT POST_NO, POST_TITLE, POST_CONTENT, MEMBER_NICKNAME, POST_VIEW, POST_DATE
+					FROM POST P
+					JOIN POST_CATEGORY USING (POST_CAT_NO)
+					JOIN MEMBER USING (MEMBER_NO)
+				WHERE POST_CAT_NO = 3
+					AND P.STATUS = 'Y'
+				ORDER BY POST_NO DESC) A
+				) 
+        WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+    <entry key="increaseCount">
+		UPDATE POST
+		   SET POST_VIEW = POST_VIEW + 1
+		 WHERE POST_NO = ?
+		   AND STATUS = 'Y'
+	</entry>
+
+    <entry key="selectPost">
+		SELECT POST_NO
+				, POST_TITLE
+				, POST_CONTENT
+				, MEMBER_NICKNAME
+				, POST_VIEW
+				, POST_DATE
+			FROM POST P
+			JOIN MEMBER USING (MEMBER_NO)
+			WHERE POST_NO = ?
+		   	  AND P.STATUS = 'Y'
+    </entry>
+    
+    <entry key="selectPost2">
+		SELECT POST_NO
+				, POST_TITLE
+				, POST_CONTENT
+				, MEMBER_NICKNAME
+				, POST_VIEW
+				, POST_DATE
+			FROM POST P
+			JOIN MEMBER USING (MEMBER_NO)
+			WHERE POST_NO = ?
+		AND P.STATUS = 'Y'
+		AND POST_CAT_NO = 3
+    </entry>
+    
+
+    <entry key="selectAttachment">
+			SELECT FILE_NO, 
+			ORIGIN_NAME, 
+			CHANGE_NAME, 
+			FILE_DATE,
+			FILE_PATH,
+			FILE_LEVEL
+			FROM ATTACHMENT
+			WHERE POST_NO = ?
+    </entry>
+
+    <entry key="insertPost">
+		 INSERT INTO POST(POST_NO
+						, POST_CAT_NO
+						, POST_TITLE
+						, POST_CONTENT
+						, MEMBER_NO)
+            	  VALUES (SEQ_PNO.NEXTVAL
+                        , ?
+                        , ?
+                        , ?
+                        , ?)
+	</entry>
+	
+	<entry key="insertAttachment">
+		INSERT INTO ATTACHMENT(FILE_NO
+							 , POST_NO
+							 , ORIGIN_NAME
+							 , CHANGE_NAME
+							 , FILE_PATH)
+                       VALUES (SEQ_ANO.NEXTVAL
+                             , SEQ_PNO.CURRVAL
+                             , ?
+                             , ?
+                             , ?)
+	</entry>
+
+	<entry key="deletePost">
+		UPDATE POST
+		   SET STATUS = 'N'
+		 WHERE POST_NO = ?
+	</entry>
+
+	<entry key="updatePost">
+		UPDATE POST
+		   SET POST_TITLE = ?
+ 			 , POST_CONTENT = ?
+		 WHERE POST_NO = ?
+	</entry>
+	
+	<entry key="updateAttachment">
+		UPDATE ATTACHMENT
+		   SET ORIGIN_NAME = ?
+  			 , CHANGE_NAME =?
+  			 , FILE_PATH =?
+  			 , FILE_DATE = SYSDATE
+		 WHERE FILE_NO =?
+	</entry>
+
+	<entry key="insertNewAttachment">
+		INSERT INTO ATTACHMENT (FILE_NO
+                      , POST_NO
+                      , ORIGIN_NAME
+                      , CHANGE_NAME
+                      , FILE_PATH)
+                VALUES (SEQ_ANO.NEXTVAL
+                      , ?
+                      , ?
+                      , ?
+                      , ?)
+	</entry>
+	
+	<entry key="insertReply">
+		INSERT INTO REPLY(REPLY_NO
+                , REPLY_CONTENT
+                , POST_NO
+                , MEMBER_NO)
+           VALUES(SEQ_RNO.NEXTVAL
+                , ?
+                , ?
+                , ?)
+	</entry>
+	
+	<entry key="selectReplyList">
+		  SELECT REPLY_NO
+		, REPLY_CONTENT
+		, MEMBER_NICKNAME
+		, TO_CHAR(CREATE_DATE, 'YY/MM/DD HH:MI:SS') CREATE_DATE
+		FROM REPLY R
+		JOIN MEMBER M USING (MEMBER_NO)
+		WHERE R.STATUS = 'Y'
+		AND POST_NO = ?
+		ORDER BY CREATE_DATE DESC
+	</entry>
+
+	<entry key="selectListCount">
+		SELECT COUNT(*) COUNT
+          FROM POST
+       	 WHERE STATUS = 'Y'
+           AND POST_CAT_NO = 2
+	</entry>
+	
+	<entry key="selectList">
+		SELECT *
+		FROM (
+        SELECT ROWNUM RNUM, A.*
+        FROM (SELECT POST_NO, POST_TITLE, POST_CONTENT, MEMBER_NICKNAME, POST_VIEW, POST_DATE
+        FROM POST P
+        JOIN POST_CATEGORY USING (POST_CAT_NO)
+        JOIN MEMBER USING (MEMBER_NO)
+       WHERE POST_CAT_NO = 2
+         AND P.STATUS = 'Y'
+       ORDER BY POST_NO DESC) A
+     )
+        WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="updateReply">
+		UPDATE REPLY
+		   SET REPLY_CONTENT = ?
+		 WHERE REPLY_NO = ?
+		   AND STATUS = 'Y'
+	</entry>
+	
+	<entry key="deleteReply">
+		UPDATE REPLY
+		   SET STATUS = 'N'
+		 WHERE REPLY_NO = ?
+	</entry>
+	
+	<entry key="selectCategoryList">
+		SELECT * 
+		  FROM POST_CATEGORY
+	</entry>
+	
+	<entry key="selectNoticeList">
+		SELECT *
+		FROM (
+        SELECT ROWNUM RNUM, A.*
+        FROM (SELECT POST_NO, POST_TITLE, POST_CONTENT, MEMBER_NICKNAME, POST_VIEW, POST_DATE
+        FROM POST P
+        JOIN POST_CATEGORY USING (POST_CAT_NO)
+        JOIN MEMBER USING (MEMBER_NO)
+       WHERE POST_CAT_NO = 1
+         AND P.STATUS = 'Y'
+       ORDER BY POST_NO DESC) A
+     )
+        WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+	<entry key="selectNoticeListCount">
+		SELECT COUNT(*) COUNT
+          FROM POST
+       	 WHERE STATUS = 'Y'
+           AND POST_CAT_NO = 1
+	</entry>
+	
+	<entry key="selectNoticePost">
+		SELECT POST_NO
+				, POST_TITLE
+				, POST_CONTENT
+				, MEMBER_NICKNAME
+				, POST_VIEW
+				, POST_DATE
+			FROM POST P
+			JOIN MEMBER USING (MEMBER_NO)
+			WHERE POST_NO = ?
+		AND P.STATUS = 'Y'
+		AND POST_CAT_NO = 1
+    </entry>
+    
+    <entry key="updateNoticePost">
+		UPDATE POST
+		   SET POST_TITLE = ?
+ 			 , POST_CONTENT = ?
+		 WHERE POST_NO = ?
+	</entry>
+	
+	<entry key="selectPostList">
+        SELECT *
+			FROM (
+				SELECT ROWNUM RNUM, A.*
+					FROM (SELECT POST_NO, POST_TITLE, POST_CONTENT, MEMBER_NICKNAME, POST_VIEW, POST_DATE
+					FROM POST P
+					JOIN POST_CATEGORY USING (POST_CAT_NO)
+					JOIN MEMBER USING (MEMBER_NO)
+				WHERE POST_CAT_NO = ?
+					AND P.STATUS = 'Y'
+				ORDER BY POST_NO DESC) A
+				) 
+        WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	
+</properties>

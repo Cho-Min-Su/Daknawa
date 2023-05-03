@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+
+	<!-- 로그인 쿼리문 -->
+    <entry key="loginMember">
+     	SELECT *
+          FROM MEMBER
+         WHERE MEMBER_ID = ?
+           AND MEMBER_PWD = ?
+           AND STATUS = 'Y'
+	</entry>
+	
+	<!-- 회원가입 쿼리문 -->
+	<entry key="insertMember">
+		INSERT INTO MEMBER(MEMBER_NO
+		                 , MEMBER_ID
+		                 , MEMBER_PWD
+		                 , MEMBER_NICKNAME
+		                 , MEMBER_NAME
+		                 , EMAIL
+		                 , PHONE
+		                 , BIRTH
+		                 , GENDER
+		                 , ADDRESS1
+		                 , ADDRESS2)
+		            VALUES(SEQ_MNO.NEXTVAL
+		                 , ?
+		                 , ?
+		                 , ?
+		                 , ?
+		                 , ?
+		                 , ?
+		                 , ?
+		                 , ?
+		                 , ?
+		                 , ?)
+	</entry>
+	
+	<!-- 회원정보 수정용 쿼리문 -->
+	<entry key="updateMember">
+		UPDATE MEMBER
+		   SET MEMBER_NICKNAME = ?
+		     , MEMBER_NAME = ?
+		     , EMAIL = ?
+		     , PHONE = ?
+		     , BIRTH = ?
+		     , GENDER = ?
+		     , ADDRESS1 = ?
+		     , ADDRESS2 = ?
+		 WHERE MEMBER_ID = ?
+		   AND STATUS = 'Y'
+	</entry>
+	
+	<!-- 회원정보 조회용 쿼리문 -->
+	<entry key="selectMember">
+		SELECT *
+          FROM MEMBER
+         WHERE MEMBER_ID = ?
+           AND STATUS = 'Y'
+	</entry>
+	
+	<!-- 아이디 중복체크 쿼리문 -->
+	<entry key="idCheck">
+		SELECT COUNT(*)
+		  FROM MEMBER
+		 WHERE MEMBER_ID = ?
+	</entry>
+	
+	<!-- 닉네임 중복체크 쿼리문 -->
+	<entry key="nicknameCheck">
+		SELECT COUNT(*)
+		  FROM MEMBER
+		 WHERE MEMBER_NICKNAME = ?
+	</entry>
+	
+	<!-- 회원 탈퇴용 쿼리문 -->
+	<entry key="deleteMember">
+		UPDATE MEMBER
+		   SET STATUS = 'N'
+		 WHERE MEMBER_ID = ?
+		   AND MEMBER_PWD = ?
+	</entry>
+	
+	<!-- 비밀번호 확인용 쿼리문 -->
+	<entry key="checkPwd">
+		SELECT COUNT(*)
+		  FROM MEMBER
+		 WHERE MEMBER_ID = ?
+		   AND MEMBER_PWD = ?
+	</entry>
+	
+	<!-- 비밀번호 변경용 쿼리문 -->
+	<entry key="updatePwd">
+		UPDATE MEMBER
+		   SET MEMBER_PWD = ?
+		 WHERE MEMBER_ID = ?
+	</entry>
+	
+	<!-- 이메일 조회용 쿼리문 -->
+	<entry key="searchPwd">
+		SELECT EMAIL
+		  FROM MEMBER
+		 WHERE MEMBER_ID = ?
+		   AND STATUS = 'Y'
+	</entry>
+	
+	<!-- 등급이름 조회용 쿼리문 -->
+	<entry key="selectGradeName">
+		SELECT GRADE_NAME
+  		  FROM MEMBER_GRADE
+ 	 	 WHERE ? BETWEEN POINT_MIN AND POINT_MAX
+	</entry>
+	
+	<!-- 총 회원 수 조회용 쿼리문 -->
+	<!--
+	<entry key="selectListCount">
+		SELECT COUNT(*) COUNT
+		  FROM MEMBER
+		 WHERE STATUS = 'Y'		 
+		   AND MEMBER_NICKNAME LIKE ?
+	</entry>
+	-->
+	
+	<!-- 회원 조회용 쿼리문 -->
+	<!--
+	<entry key="selectList">
+		SELECT *
+		  FROM (
+		    SELECT ROWNUM RNUM
+		         , A.*
+		      FROM (
+		        SELECT *
+		          FROM MEMBER
+		         WHERE MEMBER_NICKNAME = ?
+		           AND STATUS = 'Y'
+		         ORDER BY MEMBER_NO DESC
+		      ) A
+		  )
+		 WHERE RNUM BETWEEN ? AND ?
+	</entry>
+	-->
+	
+	<!-- 회원 조회용 쿼리문 -->
+	<entry key="selectMemberList">
+		SELECT *
+          FROM MEMBER
+         WHERE STATUS = 'Y'
+           AND BLACKLIST= 'N'
+         ORDER BY MEMBER_NO DESC
+	</entry>
+	
+	<!-- 블랙리스트회원 조회용 쿼리문 -->
+	<entry key="selectBlackMemberList">
+		SELECT *
+          FROM MEMBER
+         WHERE STATUS = 'Y'
+           AND BLACKLIST= 'Y'
+         ORDER BY MEMBER_NO DESC
+	</entry>
+	
+	<!-- 블랙리스트 추가 -->
+	<entry key="updateBlacklist">
+		UPDATE MEMBER
+		   SET BLACKLIST = 'Y'
+		 WHERE MEMBER_NO = ?
+	</entry>
+	
+	<!-- 블랙리스트 해제 -->
+	<entry key="updateUnBlacklist">
+		UPDATE MEMBER
+		   SET BLACKLIST = 'N'
+		 WHERE MEMBER_NO = ?
+	</entry>
+	
+	<!-- 회원 탈퇴(관리자) -->
+	<entry key="adminDeleteMember">
+		UPDATE MEMBER
+		   SET STATUS = 'N'
+		 WHERE MEMBER_NO = ?
+	</entry>
+	
+</properties>
